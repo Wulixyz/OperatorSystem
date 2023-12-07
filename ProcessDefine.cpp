@@ -36,6 +36,7 @@ struct ProcessControlBlock {
 
 ostream& operator<< (ostream& output,const ProcessControlBlock& process) {
     output << "name: " << process.name << endl;
+    output << "id: " << process.id << endl;
     output << "priority: " << process.priority << endl;
     output << "arrivalTime: " << process.arrivalTime << endl;
     output << "burstTime: " << process.burstTime << endl;
