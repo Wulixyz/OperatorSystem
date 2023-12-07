@@ -1,7 +1,8 @@
 #include <cstring>
 #include <iostream>
+#include <variant>
 
-using std::cin,std::endl,std::cout,std::ostream;
+using namespace std;
 
 enum ProcessState {
     READY,
@@ -11,22 +12,35 @@ enum ProcessState {
 
 struct ProcessControlBlock {
     std::string name;
-    int priority;
-    int arrivalTime;
-    int burstTime;
-    int usedCpuTime;
+    int id;
+    double priority;
+    double arrivalTime;
+    double burstTime;
+    double usedCpuTime;
+    double handleWeight;
     ProcessState state;
 
-    ProcessControlBlock(const std::string& n, int p, int at, int bt)
-        : name(n), priority(p), arrivalTime(at), burstTime(bt), usedCpuTime(0), state(READY) {}
+    ProcessControlBlock(int id,const std::string& n, int p, int at, int bt)
+        : id(id) ,name(n), priority(p), arrivalTime(at), burstTime(bt), usedCpuTime(0), state(READY) {}
+    
+    variant<double,string,ProcessState> getValueByName(const std::string& varName) {
+        if(varName == "name") return this -> name;
+        else if(varName == "priority") return this -> priority;
+        else if(varName == "arrivalTime") return this -> arrivalTime;
+        else if(varName == "burstTime") return this -> burstTime;
+        else if(varName == "handleWeight") return this -> handleWeight;
+        else if(varName == "state") return this -> state;
+        else return "error";
+    }
 };
 
 ostream& operator<< (ostream& output,const ProcessControlBlock& process) {
     output << "name: " << process.name << endl;
-    output << "priority: " << process.name << endl;
+    output << "priority: " << process.priority << endl;
     output << "arrivalTime: " << process.arrivalTime << endl;
     output << "burstTime: " << process.burstTime << endl;
     output << "usedCpuTime: " << process.usedCpuTime << endl;
+    output << "handleWeight: " << process.handleWeight << endl;
     output << "state:" << process.state << endl;
 
     return output;
