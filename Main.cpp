@@ -42,14 +42,14 @@ void startHighestPriorityFisrst(Scheduler& scheduler,const std::vector<ProcessCo
 void startFirstComeFirstServe(Scheduler& scheduler,const std::vector<ProcessControlBlock>& processes) {
     initProcessQueue(scheduler,processes);
 
-    std::cout << "\nFirst Come First Serve:\n";
+    std::cout << "First Come First Serve:\n";
     scheduler.firstComeFirstServe();
 }
 
 void startShortestJobFirst(Scheduler& scheduler,const std::vector<ProcessControlBlock>& processes) {
     initProcessQueue(scheduler,processes);
 
-    std::cout << "\nShortest Job First:\n";
+    std::cout << "Shortest Job First:\n";
     scheduler.shortestJobFirst();
 }
 
@@ -59,7 +59,7 @@ int main() {
 
     input(scheduler,processes);
 
-    startHighestPriorityFisrst(scheduler,processes);
+    startShortestJobFirst(scheduler,processes);
 
     // scheduler.printWaitProcess();
 
@@ -68,10 +68,6 @@ int main() {
         for(auto& object : objectToUpdate) {
             object -> update(preUpdateTime);
         }
-
-        currentTime += preUpdateTime;
-        cout << "currentTime: "  << currentTime << endl;
-        scheduler.printHandleProcess();
 
         Sleep(preUpdateTime * 1000);
     }

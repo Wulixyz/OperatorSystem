@@ -13,43 +13,28 @@ class Scheduler : public Updatable {
 private:
     std::vector<ProcessControlBlock> waitProcesses,handleProcesses;
     double currentTime = 0;
+    double dealingTime = 0;
 
     void runProcesses() {
-        for (auto& process : handleProcesses) {
-            if (process.state == READY && process.arrivalTime <= currentTime) {
-                std::cout << "Running process " << process.name << " (Priority: " << process.priority << ")\n";
-                process.state = RUNNING;
-
-                while (process.usedCpuTime < process.burstTime) {
-                    process.usedCpuTime++;
-                    currentTime++;
-                }
-
-                std::cout << "Process " << process.name << " completed\n";
-                process.state = FINISHED;
-            } else {
-                std::cout << "process: " << process.name << " is discarded" << endl;
-            }
+        if(handleProcesses.size() && dealingTime >= handleProcesses[0].burstTime) {
+            outputCompletedProcess(handleProcesses[0]);
+            deleteProcessById(handleProcesses,handleProcesses[0].id);
+            dealingTime = 0;
         }
     }
 
-public:
-    Scheduler() {
-        objectToUpdate.push_back(this);
+    void sortWaitProcesses() {
+        sort(waitProcesses.begin(),waitProcesses.end(),[&](ProcessControlBlock& a,ProcessControlBlock& b) {
+            if(a.handleWeight != b.handleWeight) return a.handleWeight > b.handleWeight;
+            else return a.id < b.id;
+        });
     }
 
-    void addWaitProcess(const ProcessControlBlock& process) {
-        waitProcesses.push_back(process);
-    }
-
-    void addHandleProcess(const ProcessControlBlock& process) {
-        handleProcesses.push_back(process);
-        sortHandleProcesses();
-    }
-
-    void clearProcess() {
-        waitProcesses.clear();
-        handleProcesses.clear();
+    void sortHandleProcesses() {
+        sort(handleProcesses.begin(),handleProcesses.end(),[&](ProcessControlBlock& a,ProcessControlBlock& b) {
+            if(a.handleWeight != b.handleWeight) return a.handleWeight > b.handleWeight;
+            else return a.id < b.id;
+        });
     }
 
     void deleteProcessById(vector<ProcessControlBlock>& processes,int id) {
@@ -61,33 +46,6 @@ public:
         if(index != processes.end()) {
             processes.erase(index);
         }
-    }
-
-    void highestPriorityFirst() {
-        settleHandleWeight("priority",1);
-        sortWaitProcesses();
-    }
-
-    void firstComeFirstServe() {
-        settleHandleWeight("arrivalTime",1);
-        sortWaitProcesses();
-    }
-
-    void shortestJobFirst() {
-        settleHandleWeight("burstTime",-1);
-        sortWaitProcesses();
-    }
-
-    void sortWaitProcesses() {
-        sort(waitProcesses.begin(),waitProcesses.end(),[&](ProcessControlBlock& a,ProcessControlBlock& b) {
-            return a.handleWeight > b.handleWeight;
-        });
-    }
-
-    void sortHandleProcesses() {
-        sort(handleProcesses.begin(),handleProcesses.end(),[&](ProcessControlBlock& a,ProcessControlBlock& b) {
-            return a.handleWeight > b.handleWeight;
-        });
     }
 
     void settleHandleWeight(string varName,int type) {
@@ -110,7 +68,6 @@ public:
     }
 
     void updateHandleProcesses() {
-        vector<int> deleteProcessId;
         for(auto& process : waitProcesses) {
             if(currentTime >= process.arrivalTime) {
                 addHandleProcess(process);
@@ -119,12 +76,57 @@ public:
         }
     }
 
-    void update(double time) override {
-        currentTime += time;
-        
-        updateHandleProcesses();
+    void outputCompletedProcess(ProcessControlBlock& process) {
+        cout << process.name << " has completed in " << currentTime << endl;
+        cout << "circulationTime is " << currentTime - process.arrivalTime << endl;
+    }
 
-        // cout << currentTime << endl;
+public:
+    Scheduler() {
+        objectToUpdate.push_back(this);
+    }
+
+    void addWaitProcess(const ProcessControlBlock& process) {
+        waitProcesses.push_back(process);
+        sort(waitProcesses.begin(),waitProcesses.end(),[&](ProcessControlBlock& a,ProcessControlBlock& b) {
+            return a.arrivalTime < b.arrivalTime;
+        });
+    }
+
+    void addHandleProcess(const ProcessControlBlock& process) {
+        if(handleProcesses.size() && process.handleWeight > handleProcesses[0].handleWeight) {
+            dealingTime = 0;
+        }
+        handleProcesses.push_back(process);
+        sortHandleProcesses();
+    }
+
+    void clearProcess() {
+        waitProcesses.clear();
+        handleProcesses.clear();
+    }
+
+    void highestPriorityFirst() {
+        settleHandleWeight("priority",1);
+        sortWaitProcesses();
+    }
+
+    void firstComeFirstServe() {
+        settleHandleWeight("arrivalTime",-1);
+        sortWaitProcesses();
+    }
+
+    void shortestJobFirst() {
+        settleHandleWeight("burstTime",-1);
+        sortWaitProcesses();
+    }
+
+    void update(double time) override {
+        updateHandleProcesses();
+        runProcesses();
+
+        currentTime += time;
+        if(handleProcesses.size()) dealingTime += time;
     } 
 
     // debug
