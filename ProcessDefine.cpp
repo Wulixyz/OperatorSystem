@@ -19,7 +19,7 @@ struct ProcessControlBlock {
     double usedCpuTime;
     double handleWeight;
     ProcessState state;
-
+    
     ProcessControlBlock(int id,const std::string& n, int p, int at, int bt)
         : id(id) ,name(n), priority(p), arrivalTime(at), burstTime(bt), usedCpuTime(0), state(READY) {}
     

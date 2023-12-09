@@ -106,6 +106,11 @@ public:
         handleProcesses.clear();
     }
 
+    void reset() {
+        clearProcess();
+        currentTime = dealingTime = 0;
+    }
+
     void highestPriorityFirst() {
         settleHandleWeight("priority",1);
         sortWaitProcesses();
