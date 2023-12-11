@@ -3,21 +3,17 @@
 #include <algorithm>
 #include <cstring>
 #include <cstdlib>
-#include <chrono>
-#include <thread>
+#include <windows.h>
 #include "Scheduler.cpp"
 #include "Updatable.cpp"
-#include <emscripten/emscripten.h>
 
 using namespace std;
 
 std::vector<Updatable*> objectToUpdate;
-Scheduler scheduler;
-std::vector<ProcessControlBlock> processes;
 
-void input() {
+void input(Scheduler& scheduler,std::vector<ProcessControlBlock>& processes) {
     freopen("input.in","r",stdin);
-    // freopen("output.out","w",stdout);
+    freopen("output.out","w",stdout);
 
     std::string processName;
     int processPriority = 0,processArrivalTime = 0,processBurstTime = 0,processUsedCupTime = 0,processState;
@@ -30,65 +26,51 @@ void input() {
 }
 
 void initProcessQueue(Scheduler& scheduler,const std::vector<ProcessControlBlock>& processes) {
-    scheduler.reset();
+    scheduler.clearProcess();
     for(auto& process : processes) {
         scheduler.addWaitProcess(process);
     }
 }
 
-void startHighestPriorityFisrst() {
+void startHighestPriorityFisrst(Scheduler& scheduler,const std::vector<ProcessControlBlock>& processes) {
     initProcessQueue(scheduler,processes);
 
     std::cout << "Highest Priority First:\n";
     scheduler.highestPriorityFirst();
 }
 
-void startFirstComeFirstServe() {
+void startFirstComeFirstServe(Scheduler& scheduler,const std::vector<ProcessControlBlock>& processes) {
     initProcessQueue(scheduler,processes);
 
     std::cout << "First Come First Serve:\n";
     scheduler.firstComeFirstServe();
 }
 
-void startShortestJobFirst() {
+void startShortestJobFirst(Scheduler& scheduler,const std::vector<ProcessControlBlock>& processes) {
     initProcessQueue(scheduler,processes);
 
     std::cout << "Shortest Job First:\n";
     scheduler.shortestJobFirst();
 }
 
-extern "C" {
+int main() {
+    Scheduler scheduler;
+    std::vector<ProcessControlBlock> processes;
 
-    EMSCRIPTEN_KEEPALIVE void init() {
-        input();
-        startHighestPriorityFisrst();
-    }
+    input(scheduler,processes);
 
-    EMSCRIPTEN_KEEPALIVE void run(double time) {
+    startShortestJobFirst(scheduler,processes);
+
+    // scheduler.printWaitProcess();
+
+    double preUpdateTime = 0.25,currentTime = 0;
+    while(true) {
         for(auto& object : objectToUpdate) {
-            object -> update(time);
+            object -> update(preUpdateTime);
         }
+
+        Sleep(preUpdateTime * 1000);
     }
 
-    // debug
-    EMSCRIPTEN_KEEPALIVE void printHandleProcess() {
-        scheduler.printHandleProcess();
-    }
-
-    EMSCRIPTEN_KEEPALIVE void printWaitProcess() {
-        scheduler.printWaitProcess();
-    }
+    return 0;
 }
-
-// int main() {
-//     init();
-
-//     double preUpdateTime = 0.25,currentTime = 0;
-//     while(true) {
-//         run(preUpdateTime);
-
-//         std::this_thread::sleep_for(std::chrono::microseconds(int(preUpdateTime * 1000)));
-//     }
-
-//     return 0;
-// }

@@ -77,8 +77,10 @@ private:
     }
 
     void outputCompletedProcess(ProcessControlBlock& process) {
-        cout << process.name << " has completed in " << currentTime << endl;
-        cout << "circulationTime is " << currentTime - process.arrivalTime << endl;
+        printf("%s has completed in %.2lf\n",process.name.c_str(),currentTime);
+        printf("circulationTime is %.2lf\n",currentTime - process.arrivalTime);
+        // cout << process.name << " has completed in " << currentTime << endl;
+        // cout << "circulationTime is " << currentTime - process.arrivalTime << endl;
     }
 
 public:
@@ -111,6 +113,14 @@ public:
         currentTime = dealingTime = 0;
     }
 
+    vector<ProcessControlBlock> getWaitProcess() {
+        return waitProcesses;
+    }
+
+    vector<ProcessControlBlock> getHandleProcess() {
+        return handleProcesses;
+    }
+
     void highestPriorityFirst() {
         settleHandleWeight("priority",1);
         sortWaitProcesses();
@@ -135,11 +145,11 @@ public:
     } 
 
     // debug
-    void printWaitProcess() {
-        for(auto process : waitProcesses) cout << process << endl;
-    }
+    // void printWaitProcess() {
+    //     for(auto process : waitProcesses) cout << process << endl;
+    // }
 
-    void printHandleProcess() {
-        for(auto process : handleProcesses) cout << process << endl;
-    }
+    // void printHandleProcess() {
+    //     for(auto process : handleProcesses) cout << process << endl;
+    // }
 }; 

@@ -1,8 +1,13 @@
 #include <cstring>
 #include <iostream>
 #include <variant>
+#include <emscripten/emscripten.h>
+#include <emscripten/val.h>
+#include <emscripten/bind.h>
+#include "VariantWrapper.cpp"
 
 using namespace std;
+using namespace emscripten;
 
 enum ProcessState {
     READY,
@@ -20,7 +25,7 @@ struct ProcessControlBlock {
     double handleWeight;
     ProcessState state;
     
-    ProcessControlBlock(int id,const std::string& n, int p, int at, int bt)
+    ProcessControlBlock(int id,const std::string& n, double p, double at, double bt)
         : id(id) ,name(n), priority(p), arrivalTime(at), burstTime(bt), usedCpuTime(0), state(READY) {}
     
     variant<double,string,ProcessState> getValueByName(const std::string& varName) {
@@ -34,15 +39,38 @@ struct ProcessControlBlock {
     }
 };
 
-ostream& operator<< (ostream& output,const ProcessControlBlock& process) {
-    output << "name: " << process.name << endl;
-    output << "id: " << process.id << endl;
-    output << "priority: " << process.priority << endl;
-    output << "arrivalTime: " << process.arrivalTime << endl;
-    output << "burstTime: " << process.burstTime << endl;
-    output << "usedCpuTime: " << process.usedCpuTime << endl;
-    output << "handleWeight: " << process.handleWeight << endl;
-    output << "state:" << process.state << endl;
-
-    return output;
+EMSCRIPTEN_BINDINGS(process_state_enum) {
+    enum_<ProcessState>("ProcessState")
+        .value("READY", READY)
+        .value("RUNNING", RUNNING)
+        .value("FINISHED", FINISHED);
 }
+
+// 注册ProcessControlBlock结构体
+EMSCRIPTEN_BINDINGS(process_control_block_struct) {
+    class_<ProcessControlBlock>("ProcessControlBlock")
+        .constructor<int, const std::string&, double, double, double>()
+        .property("name", &ProcessControlBlock::name)
+        .property("id", &ProcessControlBlock::id)
+        .property("priority", &ProcessControlBlock::priority)
+        .property("arrivalTime", &ProcessControlBlock::arrivalTime)
+        .property("burstTime", &ProcessControlBlock::burstTime)
+        .property("usedCpuTime", &ProcessControlBlock::usedCpuTime)
+        .property("handleWeight", &ProcessControlBlock::handleWeight)
+        .property("state", &ProcessControlBlock::state)
+        .function("getValueByName", &ProcessControlBlock::getValueByName);
+}
+
+
+// ostream& operator<< (ostream& output,const ProcessControlBlock& process) {
+//     output << "name: " << process.name << endl;
+//     output << "id: " << process.id << endl;
+//     output << "priority: " << process.priority << endl;
+//     output << "arrivalTime: " << process.arrivalTime << endl;
+//     output << "burstTime: " << process.burstTime << endl;
+//     output << "usedCpuTime: " << process.usedCpuTime << endl;
+//     output << "handleWeight: " << process.handleWeight << endl;
+//     output << "state:" << process.state << endl;
+
+//     return output;
+// }
