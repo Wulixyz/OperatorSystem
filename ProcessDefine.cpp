@@ -4,13 +4,8 @@
 #include <cstring>
 #include <iostream>
 #include <variant>
-#include <emscripten/emscripten.h>
-#include <emscripten/val.h>
-#include <emscripten/bind.h>
-#include "VariantWrapper.cpp"
 
 using namespace std;
-using namespace emscripten;
 
 enum ProcessState {
     READY,

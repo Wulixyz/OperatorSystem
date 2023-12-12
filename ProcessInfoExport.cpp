@@ -2,11 +2,8 @@
 #define ProcessInfoExport
 
 #include <iostream>
-#include <emscripten/emscripten.h>
-#include <emscripten/bind.h>
 
 using namespace std;
-using namespace emscripten;
 
 struct ProcessInfo
 {
