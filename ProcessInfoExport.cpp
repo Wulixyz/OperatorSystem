@@ -1,3 +1,6 @@
+#ifndef ProcessInfoExport
+#define ProcessInfoExport
+
 #include <iostream>
 #include <emscripten/emscripten.h>
 #include <emscripten/bind.h>
@@ -18,13 +21,4 @@ struct ProcessInfo
         :name(n),id(id),priority(p),arrivalTime(at),burstTime(bt),usedCpuTime(ut) {}
 };
 
-EMSCRIPTEN_BINDINGS(process_info_struct) {
-    class_<ProcessInfo>("ProcessInfo")
-        .constructor<string,int,double,double,double,double>()
-        .property("name",&ProcessInfo::name)
-        .property("id",&ProcessInfo::id)
-        .property("priority",&ProcessInfo::priority)
-        .property("arrivalTime",&ProcessInfo::arrivalTime)
-        .property("burstTime",&ProcessInfo::burstTime)
-        .property("usedCpuTime",&ProcessInfo::usedCpuTime);
-}
+#endif

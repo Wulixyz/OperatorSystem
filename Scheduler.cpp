@@ -122,16 +122,19 @@ public:
     }
 
     void highestPriorityFirst() {
+        printf("start highest priority first\n");
         settleHandleWeight("priority",1);
         sortWaitProcesses();
     }
 
     void firstComeFirstServe() {
+        printf("start first come first serve\n");
         settleHandleWeight("arrivalTime",-1);
         sortWaitProcesses();
     }
 
     void shortestJobFirst() {
+        printf("shortest first\n");
         settleHandleWeight("burstTime",-1);
         sortWaitProcesses();
     }

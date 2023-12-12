@@ -6,12 +6,10 @@
 #include <chrono>
 #include <thread>
 #include <random>
-#include <emscripten/emscripten.h>
-#include <emscripten/val.h>
-#include <emscripten/bind.h>
 #include "Scheduler.cpp"
 #include "Updatable.cpp"
 #include "ProcessInfoExport.cpp"
+#include "exports.h"
 
 using namespace std;
 using namespace emscripten;
@@ -21,21 +19,6 @@ Scheduler scheduler;
 std::vector<ProcessControlBlock> processes;
 int dividedId = 1;
 
-void startHighestPriorityFisrst() {
-    printf("Highest Priority First:\n");
-    scheduler.highestPriorityFirst();
-}
-
-void startFirstComeFirstServe() {
-    printf("First Come First Serve:\n");
-    scheduler.firstComeFirstServe();
-}
-
-void startShortestJobFirst() {
-    printf("Shortest Job First:\n");
-    scheduler.shortestJobFirst();
-}
-
 void initByRandom() { 
     scheduler.reset();
 
@@ -43,27 +26,30 @@ void initByRandom() {
     std::random_device rd;
     std::default_random_engine generator(rd());
     std::uniform_real_distribution<double> distribution(1, 10); // 生成范围在 1 到 10 之间的均匀分布的浮点数
+    std::uniform_int_distribution<int> distributionCount(5,10);
 
-    for(int i = 1;i <= 5;i ++ ) {
+    int processcount = distributionCount(generator);
+
+    for(int i = 1;i <= processcount;i ++ ) {
         scheduler.addWaitProcess(ProcessControlBlock(dividedId,"P" + to_string(dividedId),distribution(generator),distribution(generator),distribution(generator)));
         dividedId ++;
     }
 }
 
-void selectMode(const char* str) {
-    string mode(str);
-
-    if(mode == "FCFS") startFirstComeFirstServe();
-    else if(mode == "SJF") startShortestJobFirst();
-    else if(mode == "HPF") startHighestPriorityFisrst();
+void selectMode(string mode) {
+    if(mode == "FCFS") scheduler.firstComeFirstServe();
+    else if(mode == "SJF") scheduler.shortestJobFirst();
+    else if(mode == "HPF") scheduler.highestPriorityFirst();
     else printf("select error");
 }
 
-void run(double time) {
+
+void runProcess(double time) {
     for(auto& object : objectToUpdate) {
         object -> update(time);
     }
 }
+
 
 val getWaitProcess() {
     vector<ProcessControlBlock> waitProcess = scheduler.getWaitProcess();
@@ -89,11 +75,4 @@ val getHandleProcess() {
     }
 
     return jsArray;
-}
-
-EMSCRIPTEN_BINDINGS(my_module) {
-    emscripten::function("initByRandom",&initByRandom);
-    emscripten::function("selectMode",&selectMode,allow_raw_pointer<const char*>());
-    emscripten::function("getWaitProcess",&getWaitProcess);
-    emscripten::function("getHandleProcess",&getHandleProcess);
 }

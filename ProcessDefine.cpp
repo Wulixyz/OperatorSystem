@@ -1,3 +1,6 @@
+#ifndef PROCESSDEFINE_H
+#define PROCESSDEFINE_H
+
 #include <cstring>
 #include <iostream>
 #include <variant>
@@ -39,29 +42,6 @@ struct ProcessControlBlock {
     }
 };
 
-EMSCRIPTEN_BINDINGS(process_state_enum) {
-    enum_<ProcessState>("ProcessState")
-        .value("READY", READY)
-        .value("RUNNING", RUNNING)
-        .value("FINISHED", FINISHED);
-}
-
-// 注册ProcessControlBlock结构体
-EMSCRIPTEN_BINDINGS(process_control_block_struct) {
-    class_<ProcessControlBlock>("ProcessControlBlock")
-        .constructor<int, const std::string&, double, double, double>()
-        .property("name", &ProcessControlBlock::name)
-        .property("id", &ProcessControlBlock::id)
-        .property("priority", &ProcessControlBlock::priority)
-        .property("arrivalTime", &ProcessControlBlock::arrivalTime)
-        .property("burstTime", &ProcessControlBlock::burstTime)
-        .property("usedCpuTime", &ProcessControlBlock::usedCpuTime)
-        .property("handleWeight", &ProcessControlBlock::handleWeight)
-        .property("state", &ProcessControlBlock::state)
-        .function("getValueByName", &ProcessControlBlock::getValueByName);
-}
-
-
 // ostream& operator<< (ostream& output,const ProcessControlBlock& process) {
 //     output << "name: " << process.name << endl;
 //     output << "id: " << process.id << endl;
@@ -74,3 +54,5 @@ EMSCRIPTEN_BINDINGS(process_control_block_struct) {
 
 //     return output;
 // }
+
+#endif
