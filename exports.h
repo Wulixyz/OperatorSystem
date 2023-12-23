@@ -38,14 +38,6 @@ EMSCRIPTEN_BINDINGS(process_control_block_struct) {
         .function("getValueByName", &ProcessControlBlock::getValueByName);
 }
 
-EMSCRIPTEN_BINDINGS(my_module) {
-    emscripten::function("initByRandom",&initByRandom);
-    emscripten::function("selectMode",&selectMode);
-    emscripten::function("runProcess",&runProcess);
-    emscripten::function("getWaitProcess",&getWaitProcess);
-    emscripten::function("getHandleProcess",&getHandleProcess);
-}
-
 EMSCRIPTEN_BINDINGS(process_info_struct) {
     class_<ProcessInfo>("ProcessInfo")
         .constructor<string,int,double,double,double,double>()
@@ -55,6 +47,14 @@ EMSCRIPTEN_BINDINGS(process_info_struct) {
         .property("arrivalTime",&ProcessInfo::arrivalTime)
         .property("burstTime",&ProcessInfo::burstTime)
         .property("usedCpuTime",&ProcessInfo::usedCpuTime);
+}
+
+EMSCRIPTEN_BINDINGS(my_module) {
+    emscripten::function("initByRandom",&initByRandom);
+    emscripten::function("selectMode",&selectMode);
+    emscripten::function("runProcess",&runProcess);
+    emscripten::function("getWaitProcess",&getWaitProcess);
+    emscripten::function("getHandleProcess",&getHandleProcess);
 }
 
 #endif // UPDATABLE_H
