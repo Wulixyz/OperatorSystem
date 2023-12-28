@@ -20,11 +20,16 @@ struct ProcessControlBlock {
     double arrivalTime;
     double burstTime;
     double usedCpuTime;
+    double completeTime;
     double handleWeight;
     ProcessState state;
-    
+    std::string blockColor;
+
     ProcessControlBlock(int id,const std::string& n, double p, double at, double bt)
-        : id(id) ,name(n), priority(p), arrivalTime(at), burstTime(bt), usedCpuTime(0), state(READY) {}
+        : id(id) ,name(n), priority(p), arrivalTime(at), burstTime(bt), blockColor(NULL),completeTime(0),usedCpuTime(0), state(READY) {}
+    
+    ProcessControlBlock(int id,const std::string& n, double p, double at, double bt,string c)
+        : id(id) ,name(n), priority(p), arrivalTime(at), burstTime(bt), blockColor(c),completeTime(0),usedCpuTime(0), state(READY) {}
     
     variant<double,string,ProcessState> getValueByName(const std::string& varName) {
         if(varName == "name") return this -> name;

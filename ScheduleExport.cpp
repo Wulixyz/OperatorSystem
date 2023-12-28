@@ -36,6 +36,10 @@ void initByRandom() {
     }
 }
 
+void addWaitProcess(string name,double arrivalTime,double priority,double burstTime,string color) {
+    scheduler.addWaitProcess(ProcessControlBlock(dividedId ++,name,priority,arrivalTime,burstTime,color));
+}
+
 void selectMode(string mode) {
     if(mode == "FCFS") scheduler.firstComeFirstServe();
     else if(mode == "SJF") scheduler.shortestJobFirst();
@@ -43,13 +47,13 @@ void selectMode(string mode) {
     else printf("select error");
 }
 
-
-void runProcess(double time) {
-    for(auto& object : objectToUpdate) {
-        object -> update(time);
-    }
+double getCurrentTime() {
+    return scheduler.getCurrentTime();
 }
 
+double getHandleTime() {
+    return scheduler.getHandleTime();
+}
 
 val getWaitProcess() {
     vector<ProcessControlBlock> waitProcess = scheduler.getWaitProcess();
@@ -58,7 +62,7 @@ val getWaitProcess() {
     val jsArray = val::array();
     for (size_t i = 0; i < waitProcess.size(); ++i) {
         auto& process = waitProcess[i];
-        jsArray.set(i, ProcessInfo(process.name,process.id,process.arrivalTime,process.priority,process.burstTime,process.usedCpuTime));
+        jsArray.set(i, ProcessInfo(process.name,process.id,process.arrivalTime,process.priority,process.burstTime,process.usedCpuTime,process.completeTime,process.blockColor));
     }
 
     return jsArray;
@@ -71,8 +75,27 @@ val getHandleProcess() {
     val jsArray = val::array();
     for (size_t i = 0; i < handleProcess.size(); ++i) {
         auto& process = handleProcess[i];
-        jsArray.set(i, ProcessInfo(process.name,process.id,process.arrivalTime,process.priority,process.burstTime,process.usedCpuTime));
+        jsArray.set(i, ProcessInfo(process.name,process.id,process.arrivalTime,process.priority,process.burstTime,process.usedCpuTime,process.completeTime,process.blockColor));
     }
 
     return jsArray;
+}
+
+val getCompleteProcess() {
+    vector<ProcessControlBlock> completeProcess = scheduler.getCompleteProcess();
+
+    // 使用 emscripten::val 将 C++ vector 转换为 JavaScript 数组
+    val jsArray = val::array();
+    for (size_t i = 0; i < completeProcess.size(); ++i) {
+        auto& process = completeProcess[i];
+        jsArray.set(i, ProcessInfo(process.name,process.id,process.arrivalTime,process.priority,process.burstTime,process.usedCpuTime,process.completeTime,process.blockColor));
+    }
+
+    return jsArray;
+}
+
+void runProcess(double time) {  // 运行进程池 单位:s
+    for(auto& object : objectToUpdate) {
+        object -> update(time);  // 单位:s
+    }
 }

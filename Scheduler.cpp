@@ -11,7 +11,7 @@ extern std::vector<Updatable*> objectToUpdate;
 
 class Scheduler : public Updatable {
 private:
-    std::vector<ProcessControlBlock> waitProcesses,handleProcesses;
+    std::vector<ProcessControlBlock> waitProcesses,handleProcesses,completeProcesses;
     double currentTime = 0;
     double dealingTime = 0;
 
@@ -25,7 +25,7 @@ private:
 
     void sortWaitProcesses() {
         sort(waitProcesses.begin(),waitProcesses.end(),[&](ProcessControlBlock& a,ProcessControlBlock& b) {
-            if(a.handleWeight != b.handleWeight) return a.handleWeight > b.handleWeight;
+            if(a.arrivalTime != b.arrivalTime) return a.arrivalTime < b.arrivalTime;
             else return a.id < b.id;
         });
     }
@@ -79,6 +79,8 @@ private:
     void outputCompletedProcess(ProcessControlBlock& process) {
         printf("%s has completed in %.2lf\n",process.name.c_str(),currentTime);
         printf("circulationTime is %.2lf\n",currentTime - process.arrivalTime);
+        process.completeTime = currentTime;
+        completeProcesses.push_back(process);
         // cout << process.name << " has completed in " << currentTime << endl;
         // cout << "circulationTime is " << currentTime - process.arrivalTime << endl;
     }
@@ -90,9 +92,6 @@ public:
 
     void addWaitProcess(const ProcessControlBlock& process) {
         waitProcesses.push_back(process);
-        sort(waitProcesses.begin(),waitProcesses.end(),[&](ProcessControlBlock& a,ProcessControlBlock& b) {
-            return a.arrivalTime < b.arrivalTime;
-        });
     }
 
     void addHandleProcess(const ProcessControlBlock& process) {
@@ -113,12 +112,24 @@ public:
         currentTime = dealingTime = 0;
     }
 
+    double getCurrentTime() {
+        return currentTime;
+    }
+
+    double getHandleTime() {
+        return dealingTime;
+    }
+
     vector<ProcessControlBlock> getWaitProcess() {
         return waitProcesses;
     }
 
     vector<ProcessControlBlock> getHandleProcess() {
         return handleProcesses;
+    }
+
+    vector<ProcessControlBlock> getCompleteProcess() {
+        return completeProcesses;
     }
 
     void highestPriorityFirst() {
