@@ -41,18 +41,4 @@ struct ProcessControlBlock {
         else return "error";
     }
 };
-
-// ostream& operator<< (ostream& output,const ProcessControlBlock& process) {
-//     output << "name: " << process.name << endl;
-//     output << "id: " << process.id << endl;
-//     output << "priority: " << process.priority << endl;
-//     output << "arrivalTime: " << process.arrivalTime << endl;
-//     output << "burstTime: " << process.burstTime << endl;
-//     output << "usedCpuTime: " << process.usedCpuTime << endl;
-//     output << "handleWeight: " << process.handleWeight << endl;
-//     output << "state:" << process.state << endl;
-
-//     return output;
-// }
-
 #endif

@@ -81,8 +81,6 @@ private:
         printf("circulationTime is %.2lf\n",currentTime - process.arrivalTime);
         process.completeTime = currentTime;
         completeProcesses.push_back(process);
-        // cout << process.name << " has completed in " << currentTime << endl;
-        // cout << "circulationTime is " << currentTime - process.arrivalTime << endl;
     }
 
 public:
@@ -157,13 +155,4 @@ public:
         currentTime += time;
         if(handleProcesses.size()) dealingTime += time;
     } 
-
-    // debug
-    // void printWaitProcess() {
-    //     for(auto process : waitProcesses) cout << process << endl;
-    // }
-
-    // void printHandleProcess() {
-    //     for(auto process : handleProcesses) cout << process << endl;
-    // }
 }; 
